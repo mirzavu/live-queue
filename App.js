@@ -10,6 +10,7 @@ import ChatScreen from './app/components/Chat/ChatScreen';
 import SplashScreen from './app/components/Home/SplashScreen';
 import LoginScreen from './app/components/Login/LoginScreen';
 import RegisterScreen from './app/components/Register/RegisterScreen';
+import OTPScreen from './app/components/OTP/OTPScreen';
 
 
 
@@ -19,6 +20,7 @@ const SimpleApp = StackNavigator({
   Chat: { screen: ChatScreen },
   Login: { screen: LoginScreen },
   Register: { screen: RegisterScreen },
+  OTP: { screen: OTPScreen },
 
 },{
   mode: 'card',

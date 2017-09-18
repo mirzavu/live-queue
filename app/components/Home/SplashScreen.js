@@ -1,6 +1,7 @@
 import React from 'react';
-import { Animated, AppRegistry, StyleSheet, Image, Text, View, Button } from 'react-native';
+import { AsyncStorage, Animated, AppRegistry, StyleSheet, Image, Text, View, Button } from 'react-native';
 // import { StackNavigator } from 'react-navigation';
+import config from "AwesomeProject/app/config";
 
 export default class SplashScreen extends React.Component {
 
@@ -12,7 +13,6 @@ export default class SplashScreen extends React.Component {
     super(props);
 
     this.state = {
-      test: "l dfla",
       fadeAnim: new Animated.Value(0)
     };
   }
@@ -36,7 +36,34 @@ export default class SplashScreen extends React.Component {
     ).start();
 
      }, 2000); 
-    setTimeout(function(){ navigate('Home') }, 2600);               // Starts the animation
+
+    setTimeout(async function(){
+       try {
+         console.log('start')
+        const token = await AsyncStorage.getItem('access_token');
+        if(token)
+        {
+          let response = await fetch(config.API_URL+'auth/verifyToken?token='+token);
+          let responseJson = await response.json();
+          if(responseJson.user)
+          {
+            navigate('Home');
+          }
+          else
+          {
+            navigate('OTP');
+          }
+        }
+        else {
+          navigate('OTP');
+        }
+        
+      } catch (error) {
+        console.log(error);
+        // Error retrieving data
+      }
+
+    }, 2500);               // Starts the animation
   }
 
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { Alert, ActivityIndicator,Animated, AppRegistry, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Button, FormLabel, FormInput, FormValidationMessage } from 'react-native-elements';
 import styles from "./styles";
-// import { StackNavigator } from 'react-navigation';
+import config from "AwesomeProject/app/config";
 
 export default class RegisterScreen extends React.Component {
   static navigationOptions = {
@@ -22,7 +22,7 @@ export default class RegisterScreen extends React.Component {
   async onRegister(){
     this.setState({loading: true, errors: []});
     try {
-      let response = await fetch('http://192.168.43.97:8000/api/auth/signup', {
+      let response = await fetch(config.API_URL+'auth/signup', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',

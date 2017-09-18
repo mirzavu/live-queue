@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   Alert,
   BackHandler } from 'react-native';
+  
 import Fadein from '../Helpers/Fadein';
 import { Button, Icon } from 'react-native-elements';
 // import { StackNavigator } from 'react-navigation';
@@ -46,7 +47,7 @@ export default class HomeScreen extends React.Component {
       this.state.fadeAnim,            // The animated value to drive
       {
         toValue: 1,                   // Animate to opacity: 1 (opaque)
-        duration: 10000,              // Make it take a while
+        duration: 1000,              // Make it take a while
       }
     ).start();                        // Starts the animation
 
@@ -99,7 +100,7 @@ export default class HomeScreen extends React.Component {
                 type='entypo'
                 color='#68a0cf'
                 />
-              <Text style={styles.iconText}>Login</Text>
+              <Text style={styles.iconText}>Join Queue</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.icon}
             onPress={() => navigate('Register')} >
@@ -110,7 +111,21 @@ export default class HomeScreen extends React.Component {
                 type='entypo'
                 color='#68a0cf'
                 />
-              <Text style={styles.iconText}>Register</Text>
+              <Text style={styles.iconText}>Create Queue</Text>
+            </TouchableOpacity>
+          </Fadein>
+          <Fadein style={{flex:1,flexDirection: 'row', alignItems: 'center', }}>
+            <TouchableOpacity 
+              style={styles.icon}
+              onPress={() => console.log(this.props.navigation.state.routeName)} >
+
+              <Icon
+                raised
+                name='add-user'
+                type='entypo'
+                color='#68a0cf'
+                />
+              <Text style={styles.iconText}>My Queue</Text>
             </TouchableOpacity>
           </Fadein>
           <TouchableOpacity

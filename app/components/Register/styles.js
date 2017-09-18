@@ -1,6 +1,4 @@
-const React = require("react-native");
-
-const { StyleSheet } = React;
+// const React = require("react-native");
 
 export default {
   container: {
