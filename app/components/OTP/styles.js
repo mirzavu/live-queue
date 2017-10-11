@@ -72,6 +72,5 @@ export default {
     borderWidth: 3,
     width: 80,
     marginTop: 5
-
   }
 };

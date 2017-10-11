@@ -5,9 +5,25 @@ import styles from "./styles";
 import config from "AwesomeProject/app/config";
 import Fadein from '../Helpers/Fadein';
 
+import { Permissions, Notifications } from 'expo';
+
 export default class OTPScreen extends React.Component {
   static navigationOptions = {
     title: 'OTP Verification',
+    headerLeft: null,
+    headerTitleStyle: {
+      alignSelf: 'center'
+    },
+    headerTitleStyle: {
+      color: 'white',
+      fontWeight: '700',
+      justifyContent: 'space-between',
+      alignSelf: 'center'
+    },
+    headerStyle: {
+      backgroundColor: '#4ac7ff',
+      shadowOpacity: 0,
+    }
   };
 
   constructor(){
@@ -17,12 +33,35 @@ export default class OTPScreen extends React.Component {
       mobile: "",
       otp: "",
       errors: [],
-      offsetY: new Animated.Value(500),
+      offsetY: new Animated.Value(500)
     }
+  }
+
+  async componentWillMount(){
+    try {
+         console.log('start')
+        const {navigate} = this.props.navigation;
+        const token = await AsyncStorage.getItem('access_token');
+        if(token)
+        {
+          let response = await fetch(config.API_URL+'auth/verifyToken?token='+token);
+          let responseJson = await response.json();
+          console.log(responseJson);
+          if(responseJson.user)
+          {
+            navigate('Home');
+          }
+        }
+        
+      } catch (error) {
+        console.log(error);
+        // Error retrieving data
+      }
   }
 
   componentDidMount(){
     this.mobileInput.focus();
+    console.log(this.state);
   }
 
   async onSubmit(){
@@ -106,6 +145,7 @@ export default class OTPScreen extends React.Component {
       else if(responseJson.status == "ok")
       {
         await AsyncStorage.setItem('access_token', responseJson.token);
+        this.registerForPushNotificationsAsync(responseJson.token);
         navigate(responseJson.navigate);
       }
       else{
@@ -120,6 +160,41 @@ export default class OTPScreen extends React.Component {
       this.setState({loading: false});
       console.log(error);
     }
+  }
+
+  async registerForPushNotificationsAsync(token) {
+    console.log('statyes')
+    const { existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+    let finalStatus = existingStatus;
+
+    // only ask if permissions have not already been determined, because
+    // iOS won't necessarily prompt the user a second time.
+    if (existingStatus !== 'granted') {
+      // Android remote notification permissions are granted during the app
+      // install, so this will only ask on iOS
+      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+      finalStatus = status;
+    }
+
+    // Stop here if the user did not grant permissions
+    if (finalStatus !== 'granted') {
+      return;
+    }
+
+    // Get the token that uniquely identifies this device
+    let push_token = await Notifications.getExpoPushTokenAsync();
+    // POST the token to our backend so we can use it to send pushes from there
+    await fetch(config.API_URL+'savePushToken', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer '+token
+      },
+      body: JSON.stringify({
+        token: push_token
+      }),
+    });
   }
 
   render() {

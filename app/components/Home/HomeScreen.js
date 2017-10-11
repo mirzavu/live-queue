@@ -5,13 +5,19 @@ import {
   StyleSheet, 
   Text, 
   View, 
+  StatusBar,
   TouchableHighlight,
   TouchableOpacity,
   Alert,
+  AsyncStorage,
+  Keyboard,
   BackHandler } from 'react-native';
   
 import Fadein from '../Helpers/Fadein';
 import { Button, Icon } from 'react-native-elements';
+import config from "AwesomeProject/app/config";
+// import Pusher from 'pusher-js/react-native';
+// import Echo from "laravel-echo";
 // import { StackNavigator } from 'react-navigation';
 
 export default class HomeScreen extends React.Component {
@@ -28,21 +34,76 @@ export default class HomeScreen extends React.Component {
     headerStyle: {
         backgroundColor: '#4ac7ff',
         shadowOpacity: 0,
-        marginTop: 24,
       },
     headerTintColor: '#f44268'
   };
 
   constructor(props){
     super(props);
-
+    global.active_screen = "HomeScreen";
     this.state = {
-      test: "l dfla",
       fadeAnim: new Animated.Value(0)
     };
   }
 
-  componentDidMount() {
+  componentWillFocus(){
+    console.log('componentWillFocus');
+  }
+
+  componentDidFocus(){
+    console.log('componentDidFocus');
+  }
+
+  async componentDidMount() {
+    // window.Pusher = Pusher;
+
+    // window.Echo = new Echo({
+    //     namespace: false,
+    //     authEndpoint: config.SERVER_URL+'broadcasting/auth',
+    //     broadcaster: 'pusher',
+    //     key: 'cf609109f834e7a8aab8',
+    //     cluster: 'ap2',
+    //     encrypted: true
+    // });
+    // console.log(window.Echo);
+
+    // window.Echo.private('channel-name')
+    // .listen('.token-new', (e) => {
+    //     console.log(e);
+    // }).listen('token-new', (e) => {
+    //     console.log(e);
+    // });
+    
+    
+
+    Keyboard.dismiss();
+    const {navigate} = this.props.navigation;
+    const token = await AsyncStorage.getItem('access_token');
+    if(token)
+    {
+      let response = await fetch(config.API_URL+'checkQueue', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer '+token
+        }
+      });
+      let responseJson = await response.json();
+      console.log(responseJson);
+      if(responseJson.status == "inqueue")
+      {
+        navigate('Holder', {qr: responseJson.qr});
+      }
+      else if(responseJson.status == "runningqueue")
+      {
+        navigate('QRDisplay');
+      }
+
+    }
+    
+    
+    
     Animated.timing(                  // Animate over time
       this.state.fadeAnim,            // The animated value to drive
       {
@@ -53,14 +114,27 @@ export default class HomeScreen extends React.Component {
 
 
     BackHandler.addEventListener('hardwareBackPress', () => {
-      console.log(this);
-      return false;
-      if(this.props.navigation.state.routeName == "Home")
-      {
-        console.log('2')
+
+      switch(global.active_screen) {
+          case "HolderScreen":
+              alert('Please leave the queue to go back');
+              return true;
+              break;
+          case "HomeScreen":
+              BackHandler.exitApp();
+              return true;
+              break;
+          case "QRDisplay":
+              global.active_screen = "HomeScreen";
+              return false;
+              break;
+          case "QRJoin":
+              global.active_screen = "HomeScreen";
+              return false;
+              break;
+          default:
+              return false;
       }
-      console.log('dfdfd')
-      return false;
     });
   }
 
@@ -72,27 +146,16 @@ export default class HomeScreen extends React.Component {
 
     return (
       <View style={styles.container}>
+        <StatusBar backgroundColor="blue"
+        barStyle="light-content" />
         {/* <Fadein style={{opacity: fadeAnim}}>
           <Text style={styles.bigblue}>Helo {this.state.test}</Text>
         </Fadein>
       */}
-          {/*<Button
-          large
-          iconTop
-          icon={{name: 'rowing'}}
-          textStyle={styles.submitText}
-          buttonStyle={styles.submit}
-          title='Login' />
-          <Button
-          large
-          icon={{name: 'add-user'}}
-          textStyle={styles.submitText}
-          buttonStyle={styles.submit}
-          title='Register' />*/}
           <Fadein style={{flex:1,flexDirection: 'row', alignItems: 'center', }}>
             <TouchableOpacity 
               style={styles.icon}
-              onPress={() => console.log(this.props.navigation.state.routeName)} >
+              onPress={() => navigate('QRJoin')} >
 
               <Icon
                 raised
@@ -103,7 +166,7 @@ export default class HomeScreen extends React.Component {
               <Text style={styles.iconText}>Join Queue</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.icon}
-            onPress={() => navigate('Register')} >
+            onPress={() => navigate('QRDisplay')} >
 
               <Icon
                 raised
@@ -114,7 +177,7 @@ export default class HomeScreen extends React.Component {
               <Text style={styles.iconText}>Create Queue</Text>
             </TouchableOpacity>
           </Fadein>
-          <Fadein style={{flex:1,flexDirection: 'row', alignItems: 'center', }}>
+          <Fadein style={{flex:2,flexDirection: 'row', alignItems: 'center', }}>
             <TouchableOpacity 
               style={styles.icon}
               onPress={() => console.log(this.props.navigation.state.routeName)} >
@@ -128,12 +191,6 @@ export default class HomeScreen extends React.Component {
               <Text style={styles.iconText}>My Queue</Text>
             </TouchableOpacity>
           </Fadein>
-          <TouchableOpacity
-            style={styles.submit}
-            onPress={() => this.submitSuggestion(this.props)}
-            underlayColor='#fff'>
-              <Text style={styles.submitText}>Submit</Text>
-          </TouchableOpacity>
         
       </View>
     );
@@ -145,7 +202,7 @@ const styles = StyleSheet.create({
     flex:1,
     justifyContent: 'flex-start',
     alignItems: 'center',
-    backgroundColor: 'white'
+    backgroundColor: '#232f3e'
   },
   icon: {
     flex: 1, 
@@ -166,13 +223,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#fff'
   },
-  submitText:{
-      color:'#fff',
-      textAlign:'center',
-      fontWeight: 'bold'
-  },
   iconText:{
-      color:'#68a0cf',
+      color:'#edf3ff',
       fontWeight: 'bold',
       fontSize: 18
   }

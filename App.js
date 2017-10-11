@@ -1,33 +1,44 @@
 import React from 'react';
+import Expo from 'expo';
 import {
   AppRegistry,
   Text,
-  View
+  View,
+  Platform,
+  BackHandler
 } from 'react-native';
 import { StackNavigator, TabNavigator } from 'react-navigation';
 import HomeScreen from './app/components/Home/HomeScreen';
-import ChatScreen from './app/components/Chat/ChatScreen';
 import SplashScreen from './app/components/Home/SplashScreen';
-import LoginScreen from './app/components/Login/LoginScreen';
 import RegisterScreen from './app/components/Register/RegisterScreen';
 import OTPScreen from './app/components/OTP/OTPScreen';
+import LoadScreen from './app/components/Home/LoadScreen';
+import QRDisplay from './app/components/QR/QRDisplay';
+import QRJoin from './app/components/QR/QRJoin';
+import HolderScreen from './app/components/Holder/HolderScreen.js';
 
 
 
 const SimpleApp = StackNavigator({
+  Load: { screen: LoadScreen},
+  OTP: { screen: OTPScreen },
   Splash: { screen: SplashScreen },
   Home: { screen: HomeScreen },
-  Chat: { screen: ChatScreen },
-  Login: { screen: LoginScreen },
   Register: { screen: RegisterScreen },
-  OTP: { screen: OTPScreen },
+  QRDisplay: { screen: QRDisplay },
+  QRJoin: { screen: QRJoin },
+  Holder: { screen: HolderScreen },
 
 },{
   mode: 'card',
-  cardStyle: { backgroundColor: 'transparent' },
+  cardStyle: {  //To avoid status bar overlapping
+  	paddingTop: Platform.OS === 'ios' ? 0 : Expo.Constants.statusBarHeight
+   },
   tintColor: '#ffffff',
   headerMode: 'screen'
 });
+
+
 
 // class App extends React.Component {
 // 	constructor(){
@@ -38,13 +49,13 @@ const SimpleApp = StackNavigator({
 // 		return (
 // 		      <View>
 // 		      	<Text> dsfgdg</Text>
-// 		      	<SimpleApp ref={nav => { this.navigator = nav; }} />
+// 		      	<SimpleApp/>
 // 		      </View>
 //     );
 //   }
 // }
 
 
-
+global.active_screen = "";
 export default SimpleApp;
 // AppRegistry.registerComponent('SimpleApp', () => SimpleApp);

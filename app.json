@@ -1,8 +1,32 @@
 {
+  "name": "Live Queue",
+  "displayName": "Live Queue",
+  "icon": "./app/img/icon.png",
   "expo": {
-    "name": "Mirza",
-    "slug": "my-mirza",
+    "name": "Live Queue",
+    "slug": "live-queue",
     "sdkVersion": "20.0.0",
-    "privacy": "public"
+    "privacy": "public",
+    "icon": "./app/img/home-icon.png",
+    "android": {
+      "package": "com.mirza.livequeue",
+      "versionCode": "5",
+      "permissions": ["CAMERA"],
+    },
+    "version": "0.1.1",
+    "primaryColor": "#232f3e",
+    "loading": {
+      "backgroundImage": "./app/img/splash2.png",
+      "backgroundColor": "#f7faff",
+      "icon": "./app/img/icon.png",
+      "splash": {
+        "backgroundColor": "#f7faff",
+        "image": {
+          "ios": {
+            "backgroundImage": "./app/img/splash2.png"
+          }
+        }
+      }
+    }
   }
 }
